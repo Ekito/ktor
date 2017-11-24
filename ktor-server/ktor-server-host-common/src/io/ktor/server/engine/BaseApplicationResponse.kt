@@ -100,10 +100,14 @@ abstract class BaseApplicationResponse(override val call: ApplicationCall) : App
         val responseChannel = responseChannel()
         // Call user code to send data
         content.writeTo(responseChannel)
+        responseChannel.close()
     }
 
     protected open suspend fun respondFromBytes(bytes: ByteArray) {
-        responseChannel().writeFully(bytes)
+        responseChannel().apply {
+            writeFully(bytes)
+            close()
+        }
     }
 
     protected open suspend fun respondFromChannel(readChannel: ByteReadChannel) {
